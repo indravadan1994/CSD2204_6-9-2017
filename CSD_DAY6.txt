@@ -1,0 +1,544 @@
+
+Setting environment for using XAMPP for Windows.
+717140@203-IMAC07 c:\xampp
+# mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 3
+Server version: 10.1.21-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2016, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use mytestDB;
+Database changed
+MariaDB [mytestDB]> select * from products;
++------+-----------------+-------+--------------+
+| Code | Name            | Price | Manufacturer |
++------+-----------------+-------+--------------+
+|    1 | Hard drive      |   240 |            5 |
+|    2 | Memory          |   120 |            6 |
+|    3 | ZIP drive       |   150 |            4 |
+|    4 | Floppy disk     |     5 |            6 |
+|    5 | Monitor         |   240 |            1 |
+|    6 | DVD drive       |   180 |            2 |
+|    7 | CD drive        |    90 |            2 |
+|    8 | Printer         |   270 |            3 |
+|    9 | Toner cartridge |    66 |            3 |
+|   10 | DVD burner      |   180 |            2 |
+|   11 | usb drive       |   100 |         NULL |
+|   12 | 1 Tb Hard drive |   764 |            7 |
+|   13 | 2 Tb Hard drive |   964 |            7 |
+|   14 | 4 Tb Hard drive |  1234 |            7 |
++------+-----------------+-------+--------------+
+14 rows in set (0.05 sec)
+
+MariaDB [mytestDB]> show tables;
++--------------------+
+| Tables_in_mytestdb |
++--------------------+
+| assets             |
+| company            |
+| manufacturers      |
+| pet                |
+| products           |
+| student            |
+| t                  |
++--------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [mytestDB]>  select column_name,data_type, is_nullable,column_default from information_schema.columns where table_name = 'products'and table_schema = 'mytestDB';
++--------------+-----------+-------------+----------------+
+| column_name  | data_type | is_nullable | column_default |
++--------------+-----------+-------------+----------------+
+| Code         | int       | NO          | NULL           |
+| Name         | varchar   | YES         | NULL           |
+| Price        | decimal   | YES         | NULL           |
+| Manufacturer | int       | YES         | NULL           |
++--------------+-----------+-------------+----------------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from tables where table_schema = 'mytestDB';
+ERROR 1146 (42S02): Table 'mytestdb.tables' doesn't exist
+MariaDB [mytestDB]> select * from tables where table_schema = 'mytestdb';
+ERROR 1146 (42S02): Table 'mytestdb.tables' doesn't exist
+MariaDB [mytestDB]> create table students \g;
+ERROR 1113 (42000): A table must have at least 1 column
+ERROR: No query specified
+
+MariaDB [mytestDB]> create table products \g;
+ERROR 1050 (42S01): Table 'products' already exists
+ERROR: No query specified
+
+MariaDB [mytestDB]> select * from tables where table_schema = 'mytestdb';
+ERROR 1146 (42S02): Table 'mytestdb.tables' doesn't exist
+MariaDB [mytestDB]> select * from information_schema.table_constraints where table_name = 'products';
++--------------------+-------------------+-----------------+--------------+------------+-----------------+
+| CONSTRAINT_CATALOG | CONSTRAINT_SCHEMA | CONSTRAINT_NAME | TABLE_SCHEMA | TABLE_NAME | CONSTRAINT_TYPE |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+
+| def                | mytestdb          | PRIMARY         | mytestdb     | products   | PRIMARY KEY     |
+| def                | mytestdb          | products_ibfk_1 | mytestdb     | products   | FOREIGN KEY     |
++--------------------+-------------------+-----------------+--------------+------------+-----------------+
+2 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> mysqldump [mytestdb][ products] > mysqltablesql.sql;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'mysqldump [mytestdb][ products] > mysqltablesql.sql' at line 1
+MariaDB [mytestDB]> mysqldump [mytestdb][ products] > mysqltablesql.sql
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'mysqldump [mytestdb][ products] > mysqltablesql.sql' at line 1
+MariaDB [mytestDB]> mysqldump --databases mytestdb >' c:/users/717140/downloads/backup.mysql';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'mysqldump --databases mytestdb >' c:/users/717140/downloads/backup.mysql'' at line 1
+MariaDB [mytestDB]> mysqldump --databases mytestdb >' c:/users/717140/downloads/backup.mysql';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'mysqldump --databases mytestdb >' c:/users/717140/downloads/backup.mysql'' at line 1
+MariaDB [mytestDB]> exit
+Bye
+
+717140@203-IMAC07 c:\xampp
+# mysqldump --single-transaction -u root -p --databases mytestdb > c:/users/717140/downloads/backup.sql
+Enter password:
+
+717140@203-IMAC07 c:\xampp
+# mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 5
+Server version: 10.1.21-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2016, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use mytestDB;
+Database changed
+MariaDB [mytestDB]> create table Pieces(Code int, Name varchar(25), PRIMARY KEY(Code));
+Query OK, 0 rows affected (0.30 sec)
+
+MariaDB [mytestDB]> create table provides(code int auto_increment,piece int references pieces(code), provider int references providers(code), price double(10,2) check(price>10), primary key(code,piece,provider));
+Query OK, 0 rows affected (0.28 sec)
+
+MariaDB [mytestDB]> create table providers(Code int primary key, Name text);
+Query OK, 0 rows affected (0.29 sec)
+
+MariaDB [mytestDB]> desc pieces;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| Code  | int(11)     | NO   | PRI | NULL    |       |
+| Name  | varchar(25) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> desc provides;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| code     | int(11)      | NO   | PRI | NULL    | auto_increment |
+| piece    | int(11)      | NO   | PRI | NULL    |                |
+| provider | int(11)      | NO   | PRI | NULL    |                |
+| price    | double(10,2) | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> show tables;
++--------------------+
+| Tables_in_mytestdb |
++--------------------+
+| assets             |
+| company            |
+| manufacturers      |
+| pet                |
+| pieces             |
+| products           |
+| providers          |
+| provides           |
+| student            |
+| t                  |
++--------------------+
+10 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from products;
++------+-----------------+-------+--------------+
+| Code | Name            | Price | Manufacturer |
++------+-----------------+-------+--------------+
+|    1 | Hard drive      |   240 |            5 |
+|    2 | Memory          |   120 |            6 |
+|    3 | ZIP drive       |   150 |            4 |
+|    4 | Floppy disk     |     5 |            6 |
+|    5 | Monitor         |   240 |            1 |
+|    6 | DVD drive       |   180 |            2 |
+|    7 | CD drive        |    90 |            2 |
+|    8 | Printer         |   270 |            3 |
+|    9 | Toner cartridge |    66 |            3 |
+|   10 | DVD burner      |   180 |            2 |
+|   11 | usb drive       |   100 |         NULL |
+|   12 | 1 Tb Hard drive |   764 |            7 |
+|   13 | 2 Tb Hard drive |   964 |            7 |
+|   14 | 4 Tb Hard drive |  1234 |            7 |
++------+-----------------+-------+--------------+
+14 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select name,price from products where price(min);
+ERROR 1305 (42000): FUNCTION mytestdb.price does not exist
+MariaDB [mytestDB]> select name,price from products p where price(min);
+ERROR 1305 (42000): FUNCTION mytestdb.price does not exist
+MariaDB [mytestDB]> select name,price p from products  where price(min);
+ERROR 1305 (42000): FUNCTION mytestdb.price does not exist
+MariaDB [mytestDB]> select name,price p from products p where price(min);
+ERROR 1305 (42000): FUNCTION mytestdb.price does not exist
+MariaDB [mytestDB]> select name, price (min) from products;
+ERROR 1305 (42000): FUNCTION mytestdb.price does not exist
+MariaDB [mytestDB]> select a.*, b.name from products a join Manufacturers b on(a.manufacturer = b.code);
++------+-----------------+-------+--------------+-----------------+
+| Code | Name            | Price | Manufacturer | name            |
++------+-----------------+-------+--------------+-----------------+
+|    5 | Monitor         |   240 |            1 | Sony            |
+|    6 | DVD drive       |   180 |            2 | Creative Labs   |
+|    7 | CD drive        |    90 |            2 | Creative Labs   |
+|   10 | DVD burner      |   180 |            2 | Creative Labs   |
+|    8 | Printer         |   270 |            3 | Hewlett-Packard |
+|    9 | Toner cartridge |    66 |            3 | Hewlett-Packard |
+|    3 | ZIP drive       |   150 |            4 | Iomega          |
+|    1 | Hard drive      |   240 |            5 | Fujitsu         |
+|    2 | Memory          |   120 |            6 | Winchester      |
+|    4 | Floppy disk     |     5 |            6 | Winchester      |
+|   12 | 1 Tb Hard drive |   764 |            7 | usb drive       |
+|   13 | 2 Tb Hard drive |   964 |            7 | usb drive       |
+|   14 | 4 Tb Hard drive |  1234 |            7 | usb drive       |
++------+-----------------+-------+--------------+-----------------+
+13 rows in set (0.07 sec)
+
+MariaDB [mytestDB]> select name,price from products p join p.code=manufacturers.name;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '.name' at line 1
+MariaDB [mytestDB]> select p.name as products_name,p.price as product_price,m.name as manufacturer_name from products p, manufacturers m where p.manufacturer = m.code;
++-----------------+---------------+-------------------+
+| products_name   | product_price | manufacturer_name |
++-----------------+---------------+-------------------+
+| Monitor         |           240 | Sony              |
+| DVD drive       |           180 | Creative Labs     |
+| CD drive        |            90 | Creative Labs     |
+| DVD burner      |           180 | Creative Labs     |
+| Printer         |           270 | Hewlett-Packard   |
+| Toner cartridge |            66 | Hewlett-Packard   |
+| ZIP drive       |           150 | Iomega            |
+| Hard drive      |           240 | Fujitsu           |
+| Memory          |           120 | Winchester        |
+| Floppy disk     |             5 | Winchester        |
+| 1 Tb Hard drive |           764 | usb drive         |
+| 2 Tb Hard drive |           964 | usb drive         |
+| 4 Tb Hard drive |          1234 | usb drive         |
++-----------------+---------------+-------------------+
+13 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> SELECT AVG(price),m.name from products as p,Manufacturers as m where m.code = p.manufacturer GROUP BY Manufacturer;
++------------+-----------------+
+| AVG(price) | name            |
++------------+-----------------+
+|   240.0000 | Sony            |
+|   150.0000 | Creative Labs   |
+|   168.0000 | Hewlett-Packard |
+|   150.0000 | Iomega          |
+|   240.0000 | Fujitsu         |
+|    62.5000 | Winchester      |
+|   987.3333 | usb drive       |
++------------+-----------------+
+7 rows in set (0.03 sec)
+
+MariaDB [mytestDB]> SELECT m.name as Manufacturer from products as p,Manufacturers as m where m.code = p.manufacturer order by price desc limit 1;
++--------------+
+| Manufacturer |
++--------------+
+| usb drive    |
++--------------+
+1 row in set (0.00 sec)
+
+MariaDB [mytestDB]> SELECT Products.Name, MAX(Price), Manufacturers.Name FROM Products, Manufacturers WHERE Manufacturer = Manufacturers.Code GROUP BY Manufacturers.Name;
++-----------------+------------+-----------------+
+| Name            | MAX(Price) | Name            |
++-----------------+------------+-----------------+
+| DVD drive       |        180 | Creative Labs   |
+| Hard drive      |        240 | Fujitsu         |
+| Printer         |        270 | Hewlett-Packard |
+| ZIP drive       |        150 | Iomega          |
+| Monitor         |        240 | Sony            |
+| 1 Tb Hard drive |       1234 | usb drive       |
+| Memory          |        120 | Winchester      |
++-----------------+------------+-----------------+
+7 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select a.Name, max(a.price), b.Namefrom Manufacturers b join Products a on a.Manufacturer = b.codegroup by b.name;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'b join Products a on a.Manufacturer = b.codegroup by b.name' at line 1
+MariaDB [mytestDB]> INSERT INTO Pieces(Code, Name) VALUES(1,'Sprocket');INSERT INTO Pieces(Code, Name) VALUES(2,'Screw');INSERT INTO Pieces(Code, Name) VALUES(3,'Nut');INSERT INTO Pieces(Code, Name) VALUES(4,'Bolt');
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+Query OK, 1 row affected (0.09 sec)
+
+Query OK, 1 row affected (0.08 sec)
+
+MariaDB [mytestDB]> desc provider;
+ERROR 1146 (42S02): Table 'mytestdb.provider' doesn't exist
+MariaDB [mytestDB]> desc provider;
+ERROR 1146 (42S02): Table 'mytestdb.provider' doesn't exist
+MariaDB [mytestDB]> show tables;
++--------------------+
+| Tables_in_mytestdb |
++--------------------+
+| assets             |
+| company            |
+| manufacturers      |
+| pet                |
+| pieces             |
+| products           |
+| providers          |
+| provides           |
+| student            |
+| t                  |
++--------------------+
+10 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> desc providers;
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| Code  | int(11) | NO   | PRI | NULL    |       |
+| Name  | text    | YES  |     | NULL    |       |
++-------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from pieces;
++------+----------+
+| Code | Name     |
++------+----------+
+|    1 | Sprocket |
+|    2 | Screw    |
+|    3 | Nut      |
+|    4 | Bolt     |
++------+----------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> desc provides;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| code     | int(11)      | NO   | PRI | NULL    | auto_increment |
+| piece    | int(11)      | NO   | PRI | NULL    |                |
+| provider | int(11)      | NO   | PRI | NULL    |                |
+| price    | double(10,2) | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> drop providers;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'providers' at line 1
+MariaDB [mytestDB]> drop table providers;
+Query OK, 0 rows affected (0.23 sec)
+
+MariaDB [mytestDB]> create table Providers(Providers_id int auto_increment,Code varchar(25),Name text, PRIMARY KEY(Providers_id));
+Query OK, 0 rows affected (0.46 sec)
+
+MariaDB [mytestDB]> INSERT INTO Providers(Code, Name) VALUES('HAL','Clarke Enterprises');INSERT INTO Providers(Code, Name) VALUES('RBT','Susan Calvin Corp.');INSERT INTO Providers(Code, Name) VALUES('TNBC','Skellington Supplies');
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+Query OK, 1 row affected (0.09 sec)
+
+MariaDB [mytestDB]> select * from providers;
++--------------+------+----------------------+
+| Providers_id | Code | Name                 |
++--------------+------+----------------------+
+|            1 | HAL  | Clarke Enterprises   |
+|            2 | RBT  | Susan Calvin Corp.   |
+|            3 | TNBC | Skellington Supplies |
++--------------+------+----------------------+
+3 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from provides;\
+Empty set (0.00 sec)
+
+MariaDB [mytestDB]> select * from provides;
+Empty set (0.00 sec)
+
+MariaDB [mytestDB]> drop table provides;
+Query OK, 0 rows affected (0.17 sec)
+
+MariaDB [mytestDB]> create table provides(Code int auto_increment,piece int references pieces(code), provider int references providers(code), price double(10,2) check(price>10), primary key(code,piece,provider));
+Query OK, 0 rows affected (0.27 sec)
+
+MariaDB [mytestDB]> INSERT INTO Provides(Piece, Provider, Price) VALUES(1,1,10);INSERT INTO Provides(Piece, Provider, Price) VALUES(1,2,15);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,1,20);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,2,15);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,3,14);INSERT INTO Provides(Piece, Provider, Price) VALUES(3,2,50);INSERT INTO Provides(Piece, Provider, Price) VALUES(3,3,45);INSERT INTO Provides(Piece, Provider, Price) VALUES(4,1,5);INSERT INTO Provides(Piece, Provider, Price) VALUES(4,2,7);
+Query OK, 1 row affected (0.08 sec)
+
+Query OK, 1 row affected (0.06 sec)
+
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.02 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [mytestDB]> select * from provides;
++------+-------+----------+-------+
+| Code | piece | provider | price |
++------+-------+----------+-------+
+|    1 |     1 |        1 | 10.00 |
+|    2 |     1 |        2 | 15.00 |
+|    3 |     2 |        1 | 20.00 |
+|    4 |     2 |        2 | 15.00 |
+|    5 |     2 |        3 | 14.00 |
+|    6 |     3 |        2 | 50.00 |
+|    7 |     3 |        3 | 45.00 |
+|    8 |     4 |        1 |  5.00 |
+|    9 |     4 |        2 |  7.00 |
++------+-------+----------+-------+
+9 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from providers;
++--------------+------+----------------------+
+| Providers_id | Code | Name                 |
++--------------+------+----------------------+
+|            1 | HAL  | Clarke Enterprises   |
+|            2 | RBT  | Susan Calvin Corp.   |
+|            3 | TNBC | Skellington Supplies |
++--------------+------+----------------------+
+3 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from pieces;
++------+----------+
+| Code | Name     |
++------+----------+
+|    1 | Sprocket |
+|    2 | Screw    |
+|    3 | Nut      |
+|    4 | Bolt     |
++------+----------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> delete from provides;
+Query OK, 9 rows affected (0.11 sec)
+
+MariaDB [mytestDB]> desc provides;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| Code     | int(11)      | NO   | PRI | NULL    | auto_increment |
+| piece    | int(11)      | NO   | PRI | NULL    |                |
+| provider | int(11)      | NO   | PRI | NULL    |                |
+| price    | double(10,2) | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> drop table provides;
+Query OK, 0 rows affected (0.17 sec)
+
+MariaDB [mytestDB]> drop table providers;
+Query OK, 0 rows affected (0.20 sec)
+
+MariaDB [mytestDB]> create table providers(Code varchar primary key,name varchar(30));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'primary key,name varchar(30))' at line 1
+MariaDB [mytestDB]> create table providers(Code varchar(30) primary key,name varchar(30));
+Query OK, 0 rows affected (0.30 sec)
+
+MariaDB [mytestDB]> select * from providers;
+Empty set (0.00 sec)
+
+MariaDB [mytestDB]> drop table pieces;
+Query OK, 0 rows affected (0.14 sec)
+
+MariaDB [mytestDB]> drop table providers;
+Query OK, 0 rows affected (0.20 sec)
+
+MariaDB [mytestDB]> drop table provides;
+ERROR 1051 (42S02): Unknown table 'mytestdb.provides'
+MariaDB [mytestDB]> Create Table Pieces          (          Code int(5) Not Null Primary Key,          Name varchar(50)        );        Create Table Providers          (          Code varchar(5) Not Null Primary Key,          Name varchar(50)          );                  Create Table Provides          (          Code int(5) Auto_Increment,          Piece int(5) ,          Provider varchar(5),          Price decimal(10,2) Check(Price>10),      Primary Key (Code,Piece,Provider),          Foreign Key (Piece) REFERENCES Pieces(Code),          Foreign Key (Provider) REFERENCES Providers(Code)          );
+Query OK, 0 rows affected (0.62 sec)
+
+Query OK, 0 rows affected (0.25 sec)
+
+Query OK, 0 rows affected (0.34 sec)
+
+MariaDB [mytestDB]> show tables;
++--------------------+
+| Tables_in_mytestdb |
++--------------------+
+| assets             |
+| company            |
+| manufacturers      |
+| pet                |
+| pieces             |
+| products           |
+| providers          |
+| provides           |
+| student            |
+| t                  |
++--------------------+
+10 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> INSERT INTO Providers(Code, Name) VALUES('HAL','Clarke Enterprises');INSERT INTO Providers(Code, Name) VALUES('RBT','Susan Calvin Corp.');INSERT INTO Providers(Code, Name) VALUES('TNBC','Skellington Supplies');INSERT INTO Pieces(Code, Name) VALUES(1,'Sprocket');INSERT INTO Pieces(Code, Name) VALUES(2,'Screw');INSERT INTO Pieces(Code, Name) VALUES(3,'Nut');INSERT INTO Pieces(Code, Name) VALUES(4,'Bolt');INSERT INTO Provides(Piece, Provider, Price) VALUES(1,'HAL',10);INSERT INTO Provides(Piece, Provider, Price) VALUES(1,'RBT',15);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,'HAL',20);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,'RBT',15);INSERT INTO Provides(Piece, Provider, Price) VALUES(2,'TNBC',14);INSERT INTO Provides(Piece, Provider, Price) VALUES(3,'RBT',50);INSERT INTO Provides(Piece, Provider, Price) VALUES(3,'TNBC',45);INSERT INTO Provides(Piece, Provider, Price) VALUES(4,'HAL',5);INSERT INTO Provides(Piece, Provider, Price) VALUES(4,'RBT',7);
+Query OK, 1 row affected (0.08 sec)
+
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.06 sec)
+
+Query OK, 1 row affected (0.06 sec)
+
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.05 sec)
+
+Query OK, 1 row affected (0.06 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.03 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [mytestDB]> select * from provides;
++------+-------+----------+-------+
+| Code | Piece | Provider | Price |
++------+-------+----------+-------+
+|    1 |     1 | HAL      | 10.00 |
+|    2 |     1 | RBT      | 15.00 |
+|    3 |     2 | HAL      | 20.00 |
+|    4 |     2 | RBT      | 15.00 |
+|    5 |     2 | TNBC     | 14.00 |
+|    6 |     3 | RBT      | 50.00 |
+|    7 |     3 | TNBC     | 45.00 |
+|    8 |     4 | HAL      |  5.00 |
+|    9 |     4 | RBT      |  7.00 |
++------+-------+----------+-------+
+9 rows in set (0.00 sec)
+
+MariaDB [mytestDB]> select * from providers;
++------+----------------------+
+| Code | Name                 |
++------+----------------------+
+| HAL  | Clarke Enterprises   |
+| RBT  | Susan Calvin Corp.   |
+| TNBC | Skellington Supplies |
++------+----------------------+
+3 rows in set (0.00 sec)
+
+MariaDB [mytestDB]>
